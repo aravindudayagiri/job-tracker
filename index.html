@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Job Tracker</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- 1) Load Firebase modular SDKs as ES modules -->
+  <script type="module">
+    import { initializeApp }         from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getAuth }               from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+    import { getFirestore }          from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    // 2) Your Firebase config (replace with yours)
+    const firebaseConfig = {
+      apiKey:    "AIzaSyC0ssHxRUZfLjj_tnfNvYo2M0XM6PdkUxo",
+      authDomain:"job-tracker-app-43908.firebaseapp.com",
+      projectId: "job-tracker-app-43908",
+      storageBucket:"job-tracker-app-43908.appspot.com",
+      messagingSenderId:"290524265470",
+      appId:     "1:290524265470:web:e2bf1b405763de26631eaf",
+      measurementId:"G-7XE1Z7CTVQ"
+    };
+
+    // 3) Initialize Firebase
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // 4) Expose to your script.js
+    window._FB = { auth, db };
+  </script>
 </head>
 <body>
+  <!-- your auth / app UI here (same as before)… -->
+  <div id="auth-screen">…</div>
+  <div id="app-screen" class="hidden">…</div>
 
-  <header><h1>Your Job Tracker</h1></header>
-
-  <!-- Progress bar -->
-  <progress id="form-progress" max="100" value="0"></progress>
-
-  <!-- Job form -->
-  <section id="add-job">
-    <form id="job-form">
-      <input type="text"   id="company"  placeholder="Company *" required />
-      <input type="text"   id="position" placeholder="Position *" required />
-      <input type="date"   id="deadline" required />
-      <input type="url"    id="link"     placeholder="Apply Link (optional)" />
-      <select id="priority">
-        <option>High</option><option>Medium</option><option>Low</option>
-      </select>
-      <select id="status">
-        <option>To Apply</option><option>Applied</option>
-        <option>Interviewing</option><option>Offer</option><option>Rejected</option>
-      </select>
-      <textarea id="notes" placeholder="Notes…"></textarea>
-      <button type="submit">Save</button>
-    </form>
-  </section>
-
-  <!-- Job list -->
-  <section id="job-list">
-    <h2>Your Jobs</h2>
-    <ul id="jobs"></ul>
-  </section>
-
-  <script src="script.js"></script>
+  <!-- 5) Now load your main logic as a module too -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
