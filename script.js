@@ -1,7 +1,9 @@
-// 1) Your Google OAuth Client ID (from Cloud Console)
-const CLIENT_ID = '1008402588740-4pcktur9ascnaqobn81d91p0sk3ddt06.apps.googleusercontent.com';
+// Expose initGapi for the HTML onload
+window.initGapi = initGapi;
 
-// 2) The filename we'll store in your Drive AppData folder
+// 1) Your Google OAuth Client ID
+const CLIENT_ID = '1008402588740-4pcktur9ascnaqobn81d91p0sk3ddt06.apps.googleusercontent.com';
+// 2) Filename in Drive AppData
 const DRIVE_FILE_NAME = 'jobs.json';
 
 // UI helpers
@@ -9,7 +11,7 @@ const $ = id => document.getElementById(id);
 const show = el => el.classList.remove('hidden');
 const hide = el => el.classList.add('hidden');
 
-// Initialize the Google API client & Auth
+// Initialize and configure gapi client
 function initGapi() {
   gapi.load('client:auth2', async () => {
     await gapi.client.init({
@@ -20,7 +22,7 @@ function initGapi() {
   });
 }
 
-// Wire the Sign-in button
+// Wire up the Sign in button
 function attachSignin(btn, authInstance) {
   btn.onclick = async () => {
     try {
@@ -30,15 +32,14 @@ function attachSignin(btn, authInstance) {
       await loadJobsFromDrive();
     } catch (e) {
       console.error('Google sign-in error:', e);
-      alert('Sign-in failed. Check console for details.');
+      alert('Sign-in failed. Check console.');
     }
   };
 }
 
-// Load jobs.json from Drive AppDataFolder
+// Load jobs.json from Drive AppData
 async function loadJobsFromDrive() {
   try {
-    // List files named jobs.json in appDataFolder
     const listResp = await gapi.client.drive.files.list({
       spaces: 'appDataFolder',
       q: `name='${DRIVE_FILE_NAME}'`
@@ -51,7 +52,6 @@ async function loadJobsFromDrive() {
       });
       window.jobs = getResp.result.jobs || [];
     } else {
-      // No existing file
       window.jobs = [];
     }
   } catch (e) {
@@ -61,25 +61,20 @@ async function loadJobsFromDrive() {
   renderJobs();
 }
 
-// Save the in-memory jobs[] back to Drive (create or update)
+// Save or update jobs.json in Drive AppData
 async function saveJobsToDrive() {
-  const metadata = {
-    name: DRIVE_FILE_NAME,
-    parents: ['appDataFolder']
-  };
+  const metadata = { name: DRIVE_FILE_NAME, parents: ['appDataFolder'] };
   const media = {
     mimeType: 'application/json',
     body: JSON.stringify({ jobs: window.jobs }, null, 2)
   };
 
-  // See if file already exists
   const listResp = await gapi.client.drive.files.list({
     spaces: 'appDataFolder',
     q: `name='${DRIVE_FILE_NAME}'`
   });
 
   if (listResp.result.files.length) {
-    // Update it
     const fileId = listResp.result.files[0].id;
     await gapi.client.drive.files.update({
       fileId,
@@ -87,7 +82,6 @@ async function saveJobsToDrive() {
       media
     });
   } else {
-    // Create it
     await gapi.client.drive.files.create({
       resource: metadata,
       media,
@@ -96,11 +90,11 @@ async function saveJobsToDrive() {
   }
 }
 
-// Render the list of jobs into the UI
+// Render the jobs list
 function renderJobs() {
   const ul = $('jobs');
   ul.innerHTML = '';
-  (window.jobs||[]).forEach((job,i) => {
+  (window.jobs || []).forEach((job, i) => {
     const li = document.createElement('li');
     li.innerHTML = `
       <strong>${job.position}</strong> @ ${job.company}<br>
@@ -113,7 +107,7 @@ function renderJobs() {
 
 // Delete a job by index
 window.deleteJob = async i => {
-  window.jobs.splice(i,1);
+  window.jobs.splice(i, 1);
   await saveJobsToDrive();
   renderJobs();
 };
@@ -140,5 +134,5 @@ $('job-form').onsubmit = async e => {
   f.reset();
 };
 
-// Kick it all off
-initGapi();
+// Start the flow
+// (initGapi will be called by the script.js onload attribute in index.html)
