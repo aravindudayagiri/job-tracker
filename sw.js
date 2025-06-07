@@ -1,13 +1,13 @@
 // A) Cache your PWA shell
 const CACHE_NAME = 'job-tracker-shell-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  './',
+  'index.html',
+  'style.css',
+  'script.js',
+  'manifest.json',
+  'icons/icon-192.png',
+  'icons/icon-512.png'
 ];
 
 self.addEventListener('install', ev => {
