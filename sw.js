@@ -3,11 +3,11 @@ const CACHE_NAME = 'job-tracker-shell-v1';
 const ASSETS = [
   './',
   'index.html',
+  'manifest.json',
   'style.css',
   'script.js',
-  'manifest.json',
   'icons/icon-192.png',
-  'icons/icon-512.png'
+  'icons/icon-512.png',
 ];
 
 self.addEventListener('install', ev => {
