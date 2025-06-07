@@ -8,22 +8,15 @@ body {
 }
 .hidden { display: none; }
 
-#auth {
-  margin-top: 2rem;
-}
+#auth { margin-top: 2rem; }
 #btn-google-signin {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   background: #4285f4;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #fff; border: none; border-radius: 4px;
 }
 
-#app header {
-  margin-bottom: 1rem;
-}
+#app header { margin-bottom: 1rem; }
 #app header h1 {
   color: white;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
@@ -39,30 +32,21 @@ section {
 }
 
 #add-job form {
-  display: grid;
-  gap: 0.5rem;
+  display: grid; gap: 0.5rem;
 }
 #add-job input,
 #add-job select,
 #add-job textarea,
 #add-job button {
   width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.5rem; font-size: 1rem;
+  border: 1px solid #ccc; border-radius: 4px;
 }
 #add-job button {
-  background: #28a745;
-  color: #fff;
-  border: none;
-  cursor: pointer;
+  background: #28a745; color: #fff; border: none; cursor: pointer;
 }
 
-#job-list ul {
-  list-style: none;
-  padding: 0;
-}
+#job-list ul { list-style: none; padding: 0; }
 #job-list li {
   background: #fff;
   margin: 0.5rem 0;
@@ -71,10 +55,6 @@ section {
   position: relative;
 }
 #job-list button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
+  position: absolute; top: 0.5rem; right: 0.5rem;
+  background: none; border: none; cursor: pointer;
 }
