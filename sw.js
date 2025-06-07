@@ -1,4 +1,35 @@
-// sw.js
+// A) Cache your PWA shell
+const CACHE_NAME = 'job-tracker-shell-v1';
+const ASSETS = [
+  '/',
+  '/index.html',
+  '/style.css',
+  '/script.js',
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
+];
+
+self.addEventListener('install', ev => {
+  ev.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', ev => {
+  ev.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('fetch', ev => {
+  ev.respondWith(
+    caches.match(ev.request)
+      .then(cached => cached || fetch(ev.request))
+  );
+});
+
+// B) Firebase-compat for future FCM pushes
 importScripts('https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js');
 
