@@ -1,84 +1,89 @@
-import {
-  auth, db,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  collection, doc, setDoc, onSnapshot, deleteDoc
-} from './index.html'; // uses the window.fb exports
+// shortcuts
+const auth = firebase.auth();
+const db   = firebase.firestore();
+const uidKey = 'job-uid';
 
-// UI elements
-const authC  = document.getElementById('auth-container');
-const appC   = document.getElementById('app-container');
-const signup = document.getElementById('signup-form');
-const login  = document.getElementById('login-form');
-const logout = document.getElementById('logout-btn');
-const jobsUl = document.getElementById('jobs');
-const form   = document.getElementById('job-form');
+// UI refs
+const authC = document.getElementById('auth-container');
+const appC  = document.getElementById('app-container');
+const signupForm = document.getElementById('signup-form');
+const loginForm  = document.getElementById('login-form');
+const logoutBtn  = document.getElementById('logout-btn');
+const jobForm    = document.getElementById('job-form');
+const jobsList   = document.getElementById('jobs');
 
-// 1) Auth flows
-signup.addEventListener('submit', e => {
+// 1) Sign up
+signupForm.addEventListener('submit', e => {
   e.preventDefault();
-  createUserWithEmailAndPassword(auth,
-    e.target['signup-email'].value,
-    e.target['signup-password'].value
-  );
+  const email = signupForm['signup-email'].value;
+  const pass  = signupForm['signup-password'].value;
+  auth.createUserWithEmailAndPassword(email, pass)
+    .catch(console.error);
 });
 
-login.addEventListener('submit', e => {
+// 2) Log in
+loginForm.addEventListener('submit', e => {
   e.preventDefault();
-  signInWithEmailAndPassword(auth,
-    e.target['login-email'].value,
-    e.target['login-password'].value
-  );
+  const email = loginForm['login-email'].value;
+  const pass  = loginForm['login-password'].value;
+  auth.signInWithEmailAndPassword(email, pass)
+    .catch(console.error);
 });
 
-logout.onclick = () => signOut(auth);
+// 3) Log out
+logoutBtn.onclick = () => auth.signOut();
 
-// 2) React to auth state
-let unsubscribeJobs = null;
-onAuthStateChanged(auth, user => {
+// 4) React to auth changes
+auth.onAuthStateChanged(user => {
   if (user) {
-    authC .classList.add('hidden');
-    appC  .classList.remove('hidden');
-    startJobSync(user.uid);
+    authC.classList.add('hidden');
+    appC.classList.remove('hidden');
+    // start listening to this user’s jobs
+    startSync(user.uid);
   } else {
-    authC .classList.remove('hidden');
-    appC  .classList.add('hidden');
-    if (unsubscribeJobs) unsubscribeJobs();
+    appC.classList.add('hidden');
+    authC.classList.remove('hidden');
   }
 });
 
-// 3) Firestore sync per user
-function startJobSync(uid) {
-  const jobsCol = collection(db, 'users', uid, 'jobs');
-  unsubscribeJobs = onSnapshot(jobsCol, snapshot => {
-    jobsUl.innerHTML = '';
-    snapshot.forEach(docSnap => {
-      const job = docSnap.data();
-      const li  = document.createElement('li');
-      li.textContent = `${job.position} @ ${job.company} (${job.status})`;
-      jobsUl.appendChild(li);
+// 5) Firestore sync
+let unsubscribe = null;
+function startSync(uid) {
+  if (unsubscribe) unsubscribe();
+  const col = db.collection('users').doc(uid).collection('jobs');
+  unsubscribe = col.onSnapshot(snap => {
+    jobsList.innerHTML = '';
+    snap.forEach(doc => {
+      const data = doc.data();
+      const li = document.createElement('li');
+      li.className = 'job-item';
+      li.dataset.priority = data.priority;
+      li.innerHTML = `
+        <h3>${data.position} @ ${data.company}</h3>
+        <p>Status: ${data.status}</p>
+        <div class="actions">
+          <button onclick="deleteJob('${doc.id}')">🗑️</button>
+        </div>`;
+      jobsList.appendChild(li);
     });
   });
 }
 
-// 4) Add job → Firestore
-form.addEventListener('submit', async e => {
+// 6) Add a new job
+jobForm.addEventListener('submit', e => {
   e.preventDefault();
-  const user = auth.currentUser;
-  const data = {
-    company:  e.target.company.value,
-    position: e.target.position.value,
-    deadline: e.target.deadline.value,
-    status:   e.target.status.value,
-    priority: e.target.priority.value,
-    notes:    e.target.notes.value,
-    history:  [{status:e.target.status.value,date:new Date().toISOString()}]
+  const uid = auth.currentUser.uid;
+  const col = db.collection('users').doc(uid).collection('jobs');
+  const job = {
+    company:  jobForm.company.value,
+    position: jobForm.position.value,
+    deadline: jobForm.deadline.value,
+    link:     jobForm.link.value,
+    priority: jobForm.priority.value,
+    status:   jobForm.status.value,
+    notes:    jobForm.notes.value,
+    history:  [{ status: jobForm.status.value, date: new Date().toISOString() }]
   };
-  await setDoc(
-    doc(db, 'users', user.uid, 'jobs', Date.now().toString()),
-    data
-  );
-  form.reset();
+  col.add(job).catch(console.error);
+  jobForm.reset();
 });
