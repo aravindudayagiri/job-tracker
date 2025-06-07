@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Job Tracker (Drive-Backed)</title>
+  <title>Job Tracker (Drive-Backed PWA)</title>
   <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.json"/>
 </head>
 <body>
 
@@ -43,9 +44,9 @@
     </section>
   </div>
 
-  <!-- 1) Load Google API client & call initGapi() once it's ready -->
-  <script src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
-  <!-- 2) Then load your main logic -->
+  <!-- 1) Your main logic (defines initGapi, etc.) -->
   <script src="script.js"></script>
+  <!-- 2) Load Google API client & call initGapi() once it's ready -->
+  <script src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
 </body>
 </html>
