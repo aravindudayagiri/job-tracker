@@ -165,3 +165,58 @@ window.deleteJob = async id => {
     alert('Could not delete job.');
   }
 };
+// …above code unchanged…
+
+// Listen for changes and log them
+onAuthStateChanged(auth, user => {
+  if (user) {
+    // …
+    const jobsCol = collection(db, 'users', user.uid, 'jobs');
+    const q       = query(jobsCol, orderBy('timestamp'));
+    unsubscribe  = onSnapshot(q, snapshot => {
+      console.log(`Firestore: got ${snapshot.size} job docs`);
+      jobsUl.innerHTML = '';
+      snapshot.forEach(docSnap => {
+        console.log('  • doc', docSnap.id, docSnap.data());
+        renderJob(docSnap.id, docSnap.data());
+      });
+    }, err => {
+      console.error('Snapshot error:', err);
+    });
+  }
+  // …
+});
+
+// Add a new job, with logging
+jobForm.onsubmit = async e => {
+  e.preventDefault();
+  formErr.textContent = '';
+
+  if (!$('company').value || !$('position').value || !$('deadline').value) {
+    return formErr.textContent = 'Company, Position & Deadline are required.';
+  }
+
+  const user = auth.currentUser;
+  const data = {
+    company:   $('company').value,
+    position:  $('position').value,
+    deadline:  $('deadline').value,
+    link:      $('link').value,
+    priority:  $('priority').value,
+    status:    $('status').value,
+    notes:     $('notes').value,
+    history:   [{ status: $('status').value, date: new Date().toISOString().slice(0,10) }],
+    timestamp: serverTimestamp()
+  };
+
+  try {
+    const colRef = collection(db, 'users', user.uid, 'jobs');
+    const docRef = await addDoc(colRef, data);
+    console.log('Firestore: added job', docRef.id, data);
+    jobForm.reset();
+    prog.value = 0;
+  } catch (err) {
+    console.error('Error adding job:', err);
+    formErr.textContent = 'Could not save job. See console.';
+  }
+};
