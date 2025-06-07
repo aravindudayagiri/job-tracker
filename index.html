@@ -9,12 +9,12 @@
 </head>
 <body>
 
-  <!-- AUTHENTICATION SCREEN -->
+  <!-- AUTH SCREEN -->
   <div id="auth">
     <button id="btn-google-signin">Sign in with Google</button>
   </div>
 
-  <!-- MAIN APP SCREEN -->
+  <!-- APP SCREEN -->
   <div id="app" class="hidden">
     <header><h1>Your Job Tracker</h1></header>
 
@@ -44,9 +44,9 @@
     </section>
   </div>
 
-  <!-- 1) Your main logic (defines initGapi, etc.) -->
+  <!-- YOUR LOGIC -->
   <script src="script.js"></script>
-  <!-- 2) Load Google API client & call initGapi() once it's ready -->
+  <!-- GOOGLE API (calls initGapi) -->
   <script src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
 </body>
 </html>
