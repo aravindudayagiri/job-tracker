@@ -3,75 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Job Tracker – Auth + Sync</title>
+  <title>Job Tracker</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script>
-    // TODO → Replace the below with your actual config from Firebase console
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      // …other keys…
-    };
-    firebase.initializeApp(firebaseConfig);
-    // shortcuts
-    const auth = firebase.auth();
-    const db   = firebase.firestore();
-  </script>
 </head>
 <body>
 
-  <!-- AUTH UI -->
-  <div id="auth-container" class="card">
-    <h2>🚀 Welcome to JobTracker</h2>
-    <form id="signup-form" class="auth-form">
-      <input type="email"   id="signup-email"    placeholder="Email"    required />
-      <input type="password" id="signup-password" placeholder="Password" required />
-      <button type="submit">Sign Up</button>
-    </form>
-    <hr/>
-    <form id="login-form" class="auth-form">
-      <input type="email"   id="login-email"    placeholder="Email"    required />
-      <input type="password" id="login-password" placeholder="Password" required />
-      <button type="submit">Log In</button>
-    </form>
-  </div>
+  <header><h1>Your Job Tracker</h1></header>
 
-  <!-- APP UI -->
-  <div id="app-container" class="hidden">
-    <button id="logout-btn">Log Out</button>
-    <header><h1>Your Job Tracker</h1></header>
-    <main>
-      <section id="add-job" class="card">
-        <h2>Add Job</h2>
-        <form id="job-form">
-          <input type="text"   id="company"  placeholder="Company"  required />
-          <input type="text"   id="position" placeholder="Position" required />
-          <input type="date"   id="deadline" required />
-          <input type="url"    id="link"     placeholder="Apply Link (optional)" />
-          <select id="priority">
-            <option>High</option><option>Medium</option><option>Low</option>
-          </select>
-          <select id="status">
-            <option>To Apply</option><option>Applied</option>
-            <option>Interviewing</option><option>Offer</option><option>Rejected</option>
-          </select>
-          <textarea id="notes" placeholder="Notes…"></textarea>
-          <button type="submit">Save</button>
-        </form>
-      </section>
+  <!-- Progress bar -->
+  <progress id="form-progress" max="100" value="0"></progress>
 
-      <section id="job-list" class="card">
-        <h2>Your Jobs</h2>
-        <ul id="jobs"></ul>
-      </section>
-    </main>
-  </div>
+  <!-- Job form -->
+  <section id="add-job">
+    <form id="job-form">
+      <input type="text"   id="company"  placeholder="Company *" required />
+      <input type="text"   id="position" placeholder="Position *" required />
+      <input type="date"   id="deadline" required />
+      <input type="url"    id="link"     placeholder="Apply Link (optional)" />
+      <select id="priority">
+        <option>High</option><option>Medium</option><option>Low</option>
+      </select>
+      <select id="status">
+        <option>To Apply</option><option>Applied</option>
+        <option>Interviewing</option><option>Offer</option><option>Rejected</option>
+      </select>
+      <textarea id="notes" placeholder="Notes…"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </section>
+
+  <!-- Job list -->
+  <section id="job-list">
+    <h2>Your Jobs</h2>
+    <ul id="jobs"></ul>
+  </section>
 
   <script src="script.js"></script>
 </body>
