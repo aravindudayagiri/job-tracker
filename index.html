@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Job Tracker (Drive-Backed)</title>
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Load the Google APIs client library -->
-  <script src="https://apis.google.com/js/api.js"></script>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
@@ -46,6 +43,9 @@
     </section>
   </div>
 
+  <!-- 1) Load Google API client & call initGapi() once it's ready -->
+  <script src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
+  <!-- 2) Then load your main logic -->
   <script src="script.js"></script>
 </body>
 </html>
