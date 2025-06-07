@@ -1,88 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>JobTracker PWA</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="manifest" href="manifest.json"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Job Tracker (Drive-Backed)</title>
+  <link rel="stylesheet" href="style.css" />
 
-  <!-- ─── Firebase & FCM Setup ─────────────────────────────────────────────── -->
-  <script type="module">
-    import { initializeApp }    from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getAuth }          from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
-    import { getFirestore }     from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
-    import { getMessaging, getToken, onMessage }
-      from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging.js';
-
-    // ─── Your Firebase config ─────────────────────────────────────────────────
-    const firebaseConfig = {
-      apiKey:    "AIzaSyC0ssHxRUZfLjj_tnfNvYo2M0XM6PdkUxo",
-      authDomain:"job-tracker-app-43908.firebaseapp.com",
-      projectId: "job-tracker-app-43908",
-      storageBucket:"job-tracker-app-43908.appspot.com",
-      messagingSenderId:"290524265470",
-      appId:     "1:290524265470:web:e2bf1b405763de26631eaf",
-      measurementId:"G-7XE1Z7CTVQ"
-    };
-
-    // ─── Initialize Firebase & Services ───────────────────────────────────────
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getFirestore(app);
-    const fcm  = getMessaging(app);
-
-    // ─── Request Notification Permission & Retrieve FCM Token ────────────────
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        getToken(fcm, {
-          vapidKey: 'BKuNdZ2ozXaygdr9lRbbx68Zyd3ksLDpHoFIhtSmo-q5ZGQVyVBwvUwt0EoDI6-cYGKjS9KjeAw1nNho3Jjb6LY'
-        })
-        .then(token => console.log('FCM token:', token))
-        .catch(console.error);
-      }
-    });
-
-    // Expose to your app logic
-    window.FB = { auth, db, fcm };
-  </script>
+  <!-- Load the Google APIs client library -->
+  <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-  <!-- ─── AUTH SCREEN ───────────────────────────────────────────────────────── -->
-  <div id="auth-screen" class="card">
-    <h1>JobTracker</h1>
-    <div id="login">
-      <input id="login-email"    type="email"    placeholder="Email"/>
-      <input id="login-password" type="password" placeholder="Password"/>
-      <button id="btn-login">Log In</button>
-      <p>No account? <a href="#" id="show-signup">Sign up</a></p>
-    </div>
-    <div id="signup" class="hidden">
-      <input id="signup-email"    type="email"    placeholder="Email"/>
-      <input id="signup-password" type="password" placeholder="Password"/>
-      <button id="btn-signup">Sign Up</button>
-      <p>Have one? <a href="#" id="show-login">Log in</a></p>
-    </div>
-    <p id="auth-error" class="error"></p>
+
+  <!-- AUTHENTICATION SCREEN -->
+  <div id="auth">
+    <button id="btn-google-signin">Sign in with Google</button>
   </div>
 
-  <!-- ─── APP SCREEN ────────────────────────────────────────────────────────── -->
-  <div id="app-screen" class="hidden">
-    <header>
-      <h1>Welcome, <span id="user-email"></span>!</h1>
-      <button id="btn-logout">Log Out</button>
-    </header>
+  <!-- MAIN APP SCREEN -->
+  <div id="app" class="hidden">
+    <header><h1>Your Job Tracker</h1></header>
 
-    <!-- Progress bar -->
-    <progress id="form-progress" max="100" value="0"></progress>
-
-    <!-- Job Form -->
+    <!-- ADD JOB FORM -->
     <section id="add-job">
       <form id="job-form">
-        <input type="text" id="company"  placeholder="Company *" required/>
-        <input type="text" id="position" placeholder="Position *" required/>
-        <input type="date" id="deadline" required/>
-        <input type="url"  id="link"     placeholder="Apply Link (opt.)"/>
+        <input type="text"   id="company"  placeholder="Company *"  required />
+        <input type="text"   id="position" placeholder="Position *" required />
+        <input type="date"   id="deadline"  required />
+        <input type="url"    id="link"      placeholder="Apply Link (opt.)" />
         <select id="priority">
           <option>High</option><option>Medium</option><option>Low</option>
         </select>
@@ -93,25 +37,15 @@
         <textarea id="notes" placeholder="Notes…"></textarea>
         <button type="submit">Save</button>
       </form>
-      <p id="form-error" class="error"></p>
     </section>
 
-    <!-- Job List -->
+    <!-- JOB LIST -->
     <section id="job-list">
       <h2>Your Jobs</h2>
       <ul id="jobs"></ul>
     </section>
   </div>
 
-  <!-- ─── Main App Logic ─────────────────────────────────────────────────────── -->
-  <script type="module" src="script.js"></script>
-
-  <!-- ─── Register Service Worker for PWA & Background FCM ─────────────────── -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('Service Worker registered.'));
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
