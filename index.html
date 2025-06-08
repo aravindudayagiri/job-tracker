@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>📝 Job Tracker (Firebase)</title>
+  <title>📝 Job Tracker</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -18,20 +18,29 @@
       <input type="text"   id="position"  placeholder="💼 Position *"  required/>
       <input type="date"   id="deadline"                              required/>
 
-      <label for="rem1">🔔 Reminder 1</label>
-      <input type="datetime-local" id="rem1"/>
+      <div id="reminders-container"></div>
+      <button type="button" id="add-reminder-btn">➕ Add Reminder</button>
 
-      <label for="rem2">🔔 Reminder 2</label>
-      <input type="datetime-local" id="rem2"/>
+      <input type="url" id="apply-link" placeholder="🔗 Apply Link (optional)"/>
 
-      <label for="rem3">🔔 Reminder 3</label>
-      <input type="datetime-local" id="rem3"/>
+      <select id="status">
+        <option>To Apply</option>
+        <option>Applied</option>
+        <option>Interviewing</option>
+        <option>Offer</option>
+        <option>Rejected</option>
+      </select>
+
+      <select id="job-type">
+        <option>Full-time</option>
+        <option>Part-time</option>
+        <option>Internship</option>
+      </select>
 
       <textarea id="notes" placeholder="📝 Notes…"></textarea>
 
       <button type="submit">➕ Add Job</button>
     </form>
-
     <ul id="jobs"></ul>
   </div>
 
@@ -39,7 +48,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <!-- App logic -->
   <script src="script.js"></script>
 </body>
 </html>
