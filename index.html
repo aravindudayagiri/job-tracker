@@ -18,39 +18,44 @@
     <h1>📋 Your Jobs</h1>
 
     <form id="job-form">
-      <input type="text" id="company" placeholder="🏢 Company *" required/>
-      <input type="text" id="position" placeholder="💼 Position *" required/>
-      <input type="date" id="deadline" required/>
+      <input type="text"   id="company"       placeholder="🏢 Company *"   required />
+      <input type="text"   id="position"      placeholder="💼 Position *"  required />
+      <input type="date"   id="deadline"                         required />
 
       <div id="reminders-container"></div>
       <button type="button" id="add-reminder-btn">➕ Add Reminder</button>
 
-      <input type="url" id="apply-link" placeholder="🔗 Apply Link (optional)"/>
+      <input type="url"    id="apply-link"    placeholder="🔗 Apply Link (opt.)"/>
+
+      <select id="priority">
+        <option>High</option><option>Medium</option><option>Low</option>
+      </select>
 
       <select id="status">
-        <option>To Apply</option>
-        <option>Applied</option>
-        <option>Interviewing</option>
-        <option>Offer</option>
-        <option>Rejected</option>
+        <option>To Apply</option><option>Applied</option>
+        <option>Interviewing</option><option>Offer</option><option>Rejected</option>
       </select>
 
       <select id="job-type">
-        <option>Full-time</option>
-        <option>Part-time</option>
-        <option>Internship</option>
+        <option>Full-time</option><option>Part-time</option><option>Internship</option>
       </select>
 
       <textarea id="notes" placeholder="📝 Notes…"></textarea>
-      <button type="submit">➕ Add Job</button>
+
+      <button type="submit" id="btn-submit">💾 Save</button>
     </form>
 
     <div id="filter-container">
-      <label>🔎 Sort by:
-        <select id="sort">
-          <option value="deadlineAsc">🗓️ Deadline (Soonest)</option>
-          <option value="priorityHigh">⭐ Priority (High→Low)</option>
-          <option value="priorityLow">⭐ Priority (Low→High)</option>
+      <label>🗓️ Sort Deadline:
+        <select id="sort-deadline">
+          <option value="asc">Soonest First</option>
+          <option value="desc">Latest First</option>
+        </select>
+      </label>
+      <label>⭐ Sort Priority:
+        <select id="sort-priority">
+          <option value="high">High→Low</option>
+          <option value="low">Low→High</option>
         </select>
       </label>
     </div>
