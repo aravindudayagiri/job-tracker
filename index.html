@@ -3,50 +3,33 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Job Tracker (Drive-Backed PWA)</title>
+  <title>Job Tracker</title>
   <link rel="stylesheet" href="style.css"/>
-  <link rel="manifest" href="manifest.json"/>
 </head>
 <body>
-
-  <!-- AUTH SCREEN -->
   <div id="auth">
-    <button id="btn-google-signin">Sign in with Google</button>
+    <button id="btn-signin">Sign in with Google</button>
   </div>
 
-  <!-- APP SCREEN -->
   <div id="app" class="hidden">
-    <header><h1>Your Job Tracker</h1></header>
-
-    <!-- ADD JOB FORM -->
-    <section id="add-job">
-      <form id="job-form">
-        <input type="text"   id="company"  placeholder="Company *"  required />
-        <input type="text"   id="position" placeholder="Position *" required />
-        <input type="date"   id="deadline"  required />
-        <input type="url"    id="link"      placeholder="Apply Link (opt.)" />
-        <select id="priority">
-          <option>High</option><option>Medium</option><option>Low</option>
-        </select>
-        <select id="status">
-          <option>To Apply</option><option>Applied</option>
-          <option>Interviewing</option><option>Offer</option><option>Rejected</option>
-        </select>
-        <textarea id="notes" placeholder="Notes…"></textarea>
-        <button type="submit">Save</button>
-      </form>
-    </section>
-
-    <!-- JOB LIST -->
-    <section id="job-list">
-      <h2>Your Jobs</h2>
-      <ul id="jobs"></ul>
-    </section>
+    <h1>Your Jobs</h1>
+    <form id="job-form">
+      <input type="text"   id="company"   placeholder="Company *"   required/>
+      <input type="text"   id="position"  placeholder="Position *"  required/>
+      <input type="date"   id="deadline"                required/>
+      <select id="priority">
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <button type="submit">Add Job</button>
+    </form>
+    <ul id="jobs"></ul>
   </div>
 
-  <!-- YOUR LOGIC -->
+  <!-- Your logic -->
   <script src="script.js"></script>
-  <!-- GOOGLE API (calls initGapi) -->
+  <!-- Google API loader -->
   <script src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
 </body>
 </html>
