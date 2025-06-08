@@ -1,104 +1,50 @@
-// Replace with your credentials:
-const CLIENT_ID = '619964747740-6mojj8ssbiancbbvs8671asctme0r41f.apps.googleusercontent.com';
-const API_KEY   = 'AIzaSyAp1S8zTpiR6qOWk1rYVmnX59wmFKau6S8';
-const DRIVE_FILE = 'jobs.json';
+// 1) Your Firebase config (from Step 3)
+const firebaseConfig = {
+  apiKey: "AIzaSyC0ssHxRUZfLjj_tnfNvYo2M0XM6PdkUxo",
+  authDomain: "job-tracker-app-43908.firebaseapp.com",
+  projectId: "job-tracker-app-43908",
+  storageBucket: "job-tracker-app-43908.firebasestorage.app",
+  messagingSenderId: "290524265470",
+  appId: "1:290524265470:web:e2bf1b405763de26631eaf",
+  measurementId: "G-7XE1Z7CTVQ"
+};
 
-// DOM helpers
-const $ = id => document.getElementById(id);
+// 2) Init Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// 3) DOM helpers
+const $    = id => document.getElementById(id);
 const show = el => el.classList.remove('hidden');
 const hide = el => el.classList.add('hidden');
 
-// Expose for Google API loader
-window.initGapi = () => {
-  gapi.load('client:auth2', () => {
-    // 1) Initialize auth2
-    gapi.auth2.init({
-      client_id: CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/drive.appdata'
-    }).then(() => {
-      // 2) Load Drive v3 library directly (no discoveryDocs)
-      gapi.client.load('drive', 'v3').then(() => {
-        // 3) Wire up sign-in button
-        document.getElementById('btn-signin').onclick = onSignIn;
-      }, err => {
-        console.error('Failed to load Drive API', err);
-      });
-    }, err => {
-      console.error('Failed to init auth2', err);
-    });
-  });
-};
+// 4) Sign in button
+$('btn-signin').onclick = () =>
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 
-// Handle sign-in
-async function onSignIn() {
-  try {
-    await gapi.auth2.getAuthInstance().signIn();
-    hide($('auth'));
-    show($('app'));
-    await loadJobs();
-    notifyOnLoad();
-  } catch (e) {
-    console.error(e);
-    alert('Sign-in failed; check console.');
-  }
-}
+// 5) After auth, show UI & load jobs
+auth.onAuthStateChanged(user => {
+  if (!user) return;
+  hide($('auth'));
+  show($('app'));
+  loadJobs(user.uid);
+});
 
-// Load jobs.json from Drive AppData
-async function loadJobs() {
-  try {
-    const listRes = await gapi.client.drive.files.list({
-      spaces: 'appDataFolder',
-      q: `name='${DRIVE_FILE}'`
-    });
-    if (listRes.result.files.length) {
-      const fileId = listRes.result.files[0].id;
-      const getRes = await gapi.client.drive.files.get({
-        fileId,
-        alt: 'media'
-      });
-      window.jobs = getRes.result.jobs || [];
-    } else {
-      window.jobs = [];
-    }
-  } catch (e) {
-    console.error(e);
-    window.jobs = [];
-  }
+// 6) Load jobs from Firestore
+async function loadJobs(uid) {
+  const col = db.collection('jobs').doc(uid).collection('list');
+  const snap = await col.orderBy('deadline').get();
+  window.jobs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   renderJobs();
+  notifyOnLoad();
 }
 
-// Save jobs back to Drive
-async function saveJobs() {
-  const metadata = { name: DRIVE_FILE, parents: ['appDataFolder'] };
-  const media = {
-    mimeType: 'application/json',
-    body: JSON.stringify({ jobs: window.jobs }, null, 2)
-  };
-  const listRes = await gapi.client.drive.files.list({
-    spaces: 'appDataFolder',
-    q: `name='${DRIVE_FILE}'`
-  });
-  if (listRes.result.files.length) {
-    // Update existing
-    await gapi.client.drive.files.update({
-      fileId: listRes.result.files[0].id,
-      resource: metadata,
-      media
-    });
-  } else {
-    // Create new
-    await gapi.client.drive.files.create({
-      resource: metadata,
-      media
-    });
-  }
-}
-
-// Render the job list
+// 7) Render list
 function renderJobs() {
   const ul = $('jobs');
   ul.innerHTML = '';
-  (window.jobs || []).forEach((job, i) => {
+  (window.jobs || []).forEach(job => {
     const li = document.createElement('li');
     li.innerHTML = `
       <strong>${job.company}</strong> — ${job.position}<br>
@@ -107,47 +53,50 @@ function renderJobs() {
     const btn = document.createElement('button');
     btn.textContent = '×';
     btn.onclick = async () => {
-      window.jobs.splice(i, 1);
-      await saveJobs();
-      renderJobs();
+      await db.collection('jobs')
+              .doc(auth.currentUser.uid)
+              .collection('list')
+              .doc(job.id)
+              .delete();
+      loadJobs(auth.currentUser.uid);
     };
     li.appendChild(btn);
     ul.appendChild(li);
   });
 }
 
-// Handle form submission
+// 8) Add new job
 $('job-form').onsubmit = async e => {
   e.preventDefault();
   const f = e.target;
-  window.jobs.push({
-    company:  f.company.value,
-    position: f.position.value,
-    deadline: f.deadline.value,
-    priority: f.priority.value
-  });
-  await saveJobs();
-  renderJobs();
+  await db.collection('jobs')
+          .doc(auth.currentUser.uid)
+          .collection('list')
+          .add({
+            company:  f.company.value,
+            position: f.position.value,
+            deadline: f.deadline.value,
+            priority: f.priority.value
+          });
   f.reset();
+  loadJobs(auth.currentUser.uid);
 };
 
-// Notify on load for due jobs
+// 9) Browser notifications on load
 async function notifyOnLoad() {
-  if (Notification.permission !== 'granted') {
+  if (Notification.permission !== 'granted')
     await Notification.requestPermission();
-  }
-  if (Notification.permission === 'granted') {
-    const today = new Date().toISOString().slice(0,10);
-    window.jobs.forEach(job => {
-      // High=0 days ahead, Medium=1, Low=2
-      const lead = job.priority === 'High'?0:(job.priority==='Medium'?1:2);
-      const remindDate = new Date(job.deadline);
-      remindDate.setDate(remindDate.getDate() - lead);
-      if (remindDate.toISOString().slice(0,10) === today) {
-        new Notification('Job Reminder', {
-          body: `${job.position} @ ${job.company}`
-        });
-      }
-    });
-  }
+  if (Notification.permission !== 'granted') return;
+
+  const today = new Date().toISOString().slice(0,10);
+  window.jobs.forEach(job => {
+    const lead = job.priority==='High'?0:(job.priority==='Medium'?1:2);
+    const d = new Date(job.deadline);
+    d.setDate(d.getDate() - lead);
+    if (d.toISOString().slice(0,10)===today) {
+      new Notification('Job Reminder', {
+        body: `${job.position} @ ${job.company}`
+      });
+    }
+  });
 }
