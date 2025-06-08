@@ -18,18 +18,22 @@ const show = el => el.classList.remove('hidden');
 const hide = el => el.classList.add('hidden');
 
 // 3) Priority map for sorting
-const PRIORITY_VALUES = { High: 3, Medium: 2, Low: 1 };
+const PRIORITY_VALUES = { High:3, Medium:2, Low:1 };
 
-// 4) Request notification permission
+// 4) Ask notification permission
 Notification.requestPermission().then(p => console.log("Notif perm:", p));
 
-// 5) Sign-in & Sign-out
+// 5) Sign-In & Sign-Out
 $('btn-signin').onclick = () =>
   auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 $('btn-logout').onclick = () =>
-  auth.signOut().catch(err => console.error("Sign-out error:", err));
+  auth.signOut().catch(e => console.error('Sign-out error', e));
 
-// 6) Listen for auth changes
+// 6) Sort controls
+$('sort-deadline').onchange = () => renderJobs();
+$('sort-priority').onchange = () => renderJobs();
+
+// 7) Auth listener
 auth.onAuthStateChanged(user => {
   if (user) {
     hide($('auth'));
@@ -42,70 +46,66 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// 7) Sort control
-$('sort').onchange = () => renderJobs();
-
-// 8) Setup dynamic reminders
+// 8) Dynamic reminders UI
 function setupReminderUI() {
   const container = $('reminders-container');
-  const addBtn = $('add-reminder-btn');
-  addBtn.onclick = () => {
+  $('add-reminder-btn').onclick = () => {
     const count = container.querySelectorAll('.reminder-entry').length;
     if (count >= 3) return alert('Max 3 reminders');
-    const entry = document.createElement('div');
-    entry.className = 'reminder-entry';
-    entry.innerHTML = `
+    const div = document.createElement('div');
+    div.className = 'reminder-entry';
+    div.innerHTML = `
       <input type="datetime-local" class="reminder-input"/>
       <button type="button">✖️</button>
     `;
-    entry.querySelector('button').onclick = () => entry.remove();
-    container.appendChild(entry);
+    div.querySelector('button').onclick = () => div.remove();
+    container.appendChild(div);
   };
 }
 
-// 9) Load jobs from Firestore
+// 9) Load jobs & schedule
 async function loadJobs(uid) {
   const snap = await db
-    .collection('jobs')
-    .doc(uid)
-    .collection('list')
+    .collection('jobs').doc(uid).collection('list')
     .orderBy('deadline')
     .get();
-  window.jobs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  window.jobs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
   renderJobs();
   scheduleAllNotifications();
 }
 
-// 10) Render job list with sorting
+// 10) Render + Edit/Delete + Sorting
 function renderJobs() {
   const ul = $('jobs');
   ul.innerHTML = '';
 
-  // Sort a copy
-  const sortVal = $('sort').value;
-  const jobsCopy = [...window.jobs];
-  if (sortVal === 'deadlineAsc') {
-    jobsCopy.sort((a, b) =>
-      new Date(a.deadline) - new Date(b.deadline)
-    );
-  } else if (sortVal === 'priorityHigh') {
-    jobsCopy.sort((a, b) =>
-      PRIORITY_VALUES[b.priority] - PRIORITY_VALUES[a.priority]
-    );
-  } else if (sortVal === 'priorityLow') {
-    jobsCopy.sort((a, b) =>
-      PRIORITY_VALUES[a.priority] - PRIORITY_VALUES[b.priority]
-    );
-  }
+  // sort copy
+  let list = [...window.jobs];
+  // deadline
+  const sd = $('sort-deadline').value;
+  list.sort((a,b) => sd==='asc'
+    ? new Date(a.deadline)-new Date(b.deadline)
+    : new Date(b.deadline)-new Date(a.deadline)
+  );
+  // priority
+  const sp = $('sort-priority').value;
+  list.sort((a,b) => sp==='high'
+    ? PRIORITY_VALUES[b.priority]-PRIORITY_VALUES[a.priority]
+    : PRIORITY_VALUES[a.priority]-PRIORITY_VALUES[b.priority]
+  );
 
-  // Render each job
-  jobsCopy.forEach(job => {
+  list.forEach(job => {
     const li = document.createElement('li');
     li.className = 'job-item';
     li.innerHTML = `
       <h2>💼 ${job.position} @ 🏢 ${job.company}</h2>
-      <div>📅 Due: ${job.deadline} • ⭐ ${job.priority} • 📂 ${job.jobType}</div>
+      <div>
+        📅 Due: ${job.deadline} •
+        ⭐ ${job.priority} •
+        📂 ${job.jobType}
+      </div>
       <div class="controls">
+        <button data-id="${job.id}" class="edit-btn">✏️ Edit</button>
         <select data-id="${job.id}" class="status-select">
           <option${job.status==='To Apply'?' selected':''}>To Apply</option>
           <option${job.status==='Applied'?' selected':''}>Applied</option>
@@ -115,56 +115,51 @@ function renderJobs() {
         </select>
         <button data-id="${job.id}" class="del-btn">🗑️ Delete</button>
       </div>
-      <div>🔗 <a href="${job.applyLink||'#'}" target="_blank">${
-        job.applyLink ? 'Apply Link' : ''
-      }</a></div>
+      <div>🔗 <a href="${job.applyLink||'#'}" target="_blank">
+        ${job.applyLink?'Apply Link':''}
+      </a></div>
       <div>📝 Notes: <span class="notes-text">${job.notes||''}</span>
         <button data-id="${job.id}" class="edit-notes">✏️</button>
       </div>
       <ul class="history">
-        ${(job.history||[])
-          .map(h => `<li>📌 [${h.date}] ${h.status}</li>`)
-          .join('')}
+        ${(job.history||[]).map(h =>
+          `<li>📌 [${h.date}] ${h.status}</li>`
+        ).join('')}
       </ul>
     `;
     ul.appendChild(li);
   });
 
-  // Wire up delete
-  document.querySelectorAll('.del-btn').forEach(btn => {
+  // Delete
+  document.querySelectorAll('.del-btn').forEach(btn =>
     btn.onclick = async () => {
-      const id = btn.dataset.id;
-      await db
-        .collection('jobs')
+      await db.collection('jobs')
         .doc(auth.currentUser.uid)
         .collection('list')
-        .doc(id)
-        .delete();
+        .doc(btn.dataset.id).delete();
       loadJobs(auth.currentUser.uid);
-    };
-  });
+    }
+  );
 
-  // Wire up status changes
-  document.querySelectorAll('.status-select').forEach(sel => {
+  // Status change
+  document.querySelectorAll('.status-select').forEach(sel =>
     sel.onchange = async () => {
-      const id = sel.dataset.id;
-      const newStatus = sel.value;
+      const id = sel.dataset.id, newStatus = sel.value;
       const date = new Date().toISOString().slice(0,10);
-      const ref = db
-        .collection('jobs')
+      const ref = db.collection('jobs')
         .doc(auth.currentUser.uid)
         .collection('list')
         .doc(id);
       await ref.update({
         status: newStatus,
-        history: firebase.firestore.FieldValue.arrayUnion({ status: newStatus, date })
+        history: firebase.firestore.FieldValue.arrayUnion({ status:newStatus, date })
       });
       loadJobs(auth.currentUser.uid);
-    };
-  });
+    }
+  );
 
-  // Wire up notes editing
-  document.querySelectorAll('.edit-notes').forEach(btn => {
+  // Notes edit
+  document.querySelectorAll('.edit-notes').forEach(btn =>
     btn.onclick = () => {
       const id = btn.dataset.id;
       const span = btn.previousElementSibling;
@@ -173,19 +168,51 @@ function renderJobs() {
       span.replaceWith(ta);
       ta.focus();
       ta.onblur = async () => {
-        await db
-          .collection('jobs')
-          .doc(auth.currentUser.uid)
-          .collection('list')
-          .doc(id)
-          .update({ notes: ta.value });
+        await db.collection('jobs')
+          .doc(auth.currentUser.uid).collection('list')
+          .doc(id).update({ notes: ta.value });
         loadJobs(auth.currentUser.uid);
       };
-    };
-  });
+    }
+  );
+
+  // Job detail edit (populate form)
+  document.querySelectorAll('.edit-btn').forEach(btn =>
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      const job = window.jobs.find(j => j.id===id);
+      if (!job) return;
+      // fill form
+      $('company').value = job.company;
+      $('position').value = job.position;
+      $('deadline').value = job.deadline;
+      $('apply-link').value = job.applyLink || '';
+      $('priority').value   = job.priority;
+      $('status').value     = job.status;
+      $('job-type').value   = job.jobType;
+      $('notes').value      = job.notes || '';
+      // clear old reminders
+      const rc = $('reminders-container');
+      rc.innerHTML = '';
+      job.reminders.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'reminder-entry';
+        div.innerHTML = `
+          <input type="datetime-local" class="reminder-input" value="${r}"/>
+          <button type="button">✖️</button>
+        `;
+        div.querySelector('button').onclick = () => div.remove();
+        rc.appendChild(div);
+      });
+      // mark editing
+      window.editingJobId = id;
+      $('btn-submit').textContent = '🔄 Update';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  );
 }
 
-// 11) Handle form submission
+// 11) Form submission (add or update)
 $('job-form').onsubmit = async e => {
   e.preventDefault();
   const f = e.target;
@@ -193,46 +220,67 @@ $('job-form').onsubmit = async e => {
     document.querySelectorAll('.reminder-input')
   ).map(i => new Date(i.value).toISOString());
 
-  const firstStatus = f.status.value;
-  const todayDate = new Date().toISOString().slice(0,10);
+  const data = {
+    company:   f.company.value,
+    position:  f.position.value,
+    deadline:  f.deadline.value,
+    reminders,
+    applyLink: f['apply-link'].value,
+    priority:  f.priority.value,
+    status:    f.status.value,
+    jobType:   f['job-type'].value,
+    notes:     f.notes.value,
+  };
 
-  await db
-    .collection('jobs')
-    .doc(auth.currentUser.uid)
-    .collection('list')
-    .add({
-      company: f.company.value,
-      position: f.position.value,
-      deadline: f.deadline.value,
-      reminders,
-      applyLink: f['apply-link'].value,
-      status: firstStatus,
-      jobType: f['job-type'].value,
-      notes: f.notes.value || '',
-      history: [{ status: firstStatus, date: todayDate }]
-    });
+  const uid = auth.currentUser.uid;
+  if (window.editingJobId) {
+    // update existing
+    const id = window.editingJobId;
+    // if status changed, append history
+    const old = window.jobs.find(j => j.id===id);
+    if (old.status !== data.status) {
+      const date = new Date().toISOString().slice(0,10);
+      data.history = firebase.firestore.FieldValue.arrayUnion({
+        status: data.status, date
+      });
+    }
+    await db.collection('jobs').doc(uid)
+      .collection('list').doc(id).update(data);
+  } else {
+    // new job, add history
+    data.history = [{
+      status: data.status,
+      date: new Date().toISOString().slice(0,10)
+    }];
+    await db.collection('jobs').doc(uid)
+      .collection('list').add(data);
+  }
+
+  // reset
   f.reset();
   $('reminders-container').innerHTML = '';
-  loadJobs(auth.currentUser.uid);
+  $('btn-submit').textContent = '💾 Save';
+  window.editingJobId = null;
+  loadJobs(uid);
 };
 
-// 12) Schedule in-page notifications
+// 12) In-page notifications
 function scheduleAllNotifications() {
   if (Notification.permission !== 'granted') {
     Notification.requestPermission();
   }
   const now = Date.now();
   window.jobs.forEach(job => {
-    (job.reminders || []).forEach(rem => {
-      const t = new Date(rem).getTime();
+    (job.reminders||[]).forEach(r => {
+      const t = new Date(r).getTime();
       const delta = t - now;
-      if (delta > 0 && delta < 1000 * 60 * 60 * 24 * 30) {
+      if (delta > 0) {
         setTimeout(() => {
           new Notification('🔔 Job Reminder', {
             body: `${job.position} @ ${job.company}`
           });
         }, delta);
-      } else if (Math.abs(delta) < 1000 * 60) {
+      } else if (Math.abs(delta) < 60000) {
         new Notification('🔔 Job Reminder', {
           body: `${job.position} @ ${job.company}`
         });
