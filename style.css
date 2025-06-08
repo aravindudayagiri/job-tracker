@@ -1,65 +1,146 @@
+/* A soft, modern gradient background */
 body {
   margin: 0;
   padding: 1rem;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
   text-align: center;
-  background: #eef;
+  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+  color: #333;
 }
+
 .hidden { display: none; }
 
+/* Sign-in */
 #btn-signin {
   margin-top: 2rem;
   padding: 0.75rem 1.5rem;
   background: #4285f4;
   color: #fff;
+  font-size: 1rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
+#btn-signin:hover { background: #3367d6; }
 
+/* Heading */
 h1 {
   margin-top: 1rem;
+  font-size: 2rem;
 }
 
+/* Form layout */
 form {
-  margin: 1rem auto;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  margin: 1.5rem auto;
+  max-width: 500px;
+  background: rgba(255,255,255,0.9);
+  padding: 1rem;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0.75rem;
 }
-form input,
-form select,
-form button {
+
+form input[type="text"],
+form input[type="date"],
+form input[type="datetime-local"],
+form textarea {
+  grid-column: span 2;
   padding: 0.5rem;
   font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
+
+form label {
+  font-size: 0.9rem;
+  align-self: center;
+  text-align: left;
+}
+
+form textarea {
+  height: 4rem;
+  resize: vertical;
+}
+
 form button {
+  grid-column: span 2;
+  padding: 0.75rem;
+  font-size: 1rem;
   background: #28a745;
   color: #fff;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
+form button:hover { background: #218838; }
 
+/* Job list */
 #jobs {
   list-style: none;
   padding: 0;
-  max-width: 400px;
+  max-width: 500px;
   margin: 1rem auto;
   text-align: left;
 }
-#jobs li {
-  background: #fff;
-  margin: 0.5rem 0;
-  padding: 0.75rem;
-  border-radius: 4px;
+
+.job-item {
+  background: rgba(255,255,255,0.95);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
   position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-#jobs li button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: none;
+
+.job-item h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.job-item .controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.job-item .controls select,
+.job-item .controls button {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.job-item .controls button {
+  background: #dc3545;
+  color: #fff;
   border: none;
-  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.job-item .controls button:hover {
+  background: #c82333;
+}
+
+.job-item .notes-text {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.job-item textarea {
+  width: 100%;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.job-item .history {
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  background: #f9fafb;
+  padding: 0.5rem;
+  border-radius: 4px;
 }
