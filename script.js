@@ -9,16 +9,23 @@ const show = el => el.classList.remove('hidden');
 const hide = el => el.classList.add('hidden');
 
 // Expose for Google API loader
-window.initGapi = async function() {
-  await gapi.load('client:auth2', async () => {
-    await gapi.client.init({
-      apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+window.initGapi = () => {
+  gapi.load('client:auth2', () => {
+    // 1) Initialize auth2
+    gapi.auth2.init({
+      client_id: CLIENT_ID,
       scope: 'https://www.googleapis.com/auth/drive.appdata'
+    }).then(() => {
+      // 2) Load Drive v3 library directly (no discoveryDocs)
+      gapi.client.load('drive', 'v3').then(() => {
+        // 3) Wire up sign-in button
+        document.getElementById('btn-signin').onclick = onSignIn;
+      }, err => {
+        console.error('Failed to load Drive API', err);
+      });
+    }, err => {
+      console.error('Failed to init auth2', err);
     });
-    // Wire up sign-in button
-    $('btn-signin').onclick = onSignIn;
   });
 };
 
