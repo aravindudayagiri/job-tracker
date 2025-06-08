@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Job Tracker</title>
+  <title>Job Tracker (Firebase)</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -18,20 +18,20 @@
       <input type="text"   id="position"  placeholder="Position *"  required/>
       <input type="date"   id="deadline"                required/>
       <select id="priority">
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
       </select>
       <button type="submit">Add Job</button>
     </form>
     <ul id="jobs"></ul>
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <!-- Your logic -->
   <script src="script.js"></script>
-  <!-- Google API loader -->
-  <script src="https://apis.google.com/js/api.js" onload="initGapi()"></script>
 </body>
 </html>
-
-
