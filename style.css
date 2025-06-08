@@ -1,15 +1,14 @@
 body {
   margin: 0;
   padding: 1rem;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+  color: #333;
   text-align: center;
-  background: #eef;
 }
 .hidden { display: none; }
 
-/* Buttons */
-#btn-signin,
-#btn-logout {
+#btn-signin, #btn-logout {
   margin: 1rem;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
@@ -20,43 +19,143 @@ body {
 }
 #btn-signin { background: #4285f4; }
 #btn-signin:hover { background: #3367d6; }
-
 #btn-logout { background: #dc3545; }
 #btn-logout:hover { background: #c82333; }
 
-/* Form */
 form {
   margin: 1rem auto;
-  max-width: 400px;
+  max-width: 500px;
+  background: rgba(255,255,255,0.9);
+  padding: 1rem;
+  border-radius: 8px;
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  text-align: left;
 }
-form input,
+
+form input[type="text"],
+form input[type="date"],
+form input[type="url"],
 form select,
-form button {
+form textarea,
+form button,
+#add-reminder-btn {
+  grid-column: span 2;
   padding: 0.5rem;
   font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
-form button {
+
+#add-reminder-btn {
+  background: #ffc107;
+  color: #333;
+  cursor: pointer;
+}
+#add-reminder-btn:hover { background: #e0a800; }
+
+form button[type="submit"] {
   background: #28a745;
   color: #fff;
   cursor: pointer;
 }
-form button:hover {
-  background: #218838;
+form button[type="submit"]:hover { background: #218838; }
+
+#reminders-container .reminder-entry {
+  display: flex;
+  gap: 0.5rem;
+  grid-column: span 2;
+}
+.reminder-entry input { flex: 1; }
+.reminder-entry button {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0 0.5rem;
+  cursor: pointer;
+}
+.reminder-entry button:hover { background: #c82333; }
+
+#filter-container {
+  max-width: 500px;
+  margin: 1rem auto;
+  text-align: left;
+  font-size: 0.9rem;
+}
+#filter-container select {
+  margin-left: 0.5rem;
+  padding: 0.3rem;
+  font-size: 0.9rem;
 }
 
-/* Job list */
 #jobs {
   list-style: none;
   padding: 0;
-  max-width: 400px;
+  max-width: 500px;
   margin: 1rem auto;
   text-align: left;
 }
-#jobs li {
-  background: #fff;
-  margin: 0.5rem 0;
-  padding: 0.75rem;
+
+.job-item {
+  background: rgba(255,255,255,0.95);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.job-item h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.job-item .controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.job-item .controls select,
+.job-item .controls button {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
   border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.job-item .controls button {
+  background: #dc3545;
+  color: #fff;
+  cursor: pointer;
+}
+.job-item .controls button:hover {
+  background: #c82333;
+}
+
+.job-item .notes-text {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.job-item textarea {
+  width: 100%;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.job-item .history {
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  background: #f9fafb;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.job-item .history li {
+  margin-bottom: 0.25rem;
 }
