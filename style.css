@@ -1,146 +1,88 @@
-/* A soft, modern gradient background */
 body {
-  margin: 0;
-  padding: 1rem;
+  margin: 0; padding: 1rem;
   font-family: 'Segoe UI', Tahoma, sans-serif;
-  text-align: center;
   background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-  color: #333;
+  color: #333; text-align: center;
 }
-
 .hidden { display: none; }
 
-/* Sign-in */
 #btn-signin {
-  margin-top: 2rem;
-  padding: 0.75rem 1.5rem;
-  background: #4285f4;
-  color: #fff;
-  font-size: 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  margin-top: 2rem; padding: 0.75rem 1.5rem;
+  background: #4285f4; color: white; border: none;
+  border-radius: 6px; cursor: pointer;
 }
 #btn-signin:hover { background: #3367d6; }
 
-/* Heading */
-h1 {
-  margin-top: 1rem;
-  font-size: 2rem;
-}
+h1 { margin-top: 1rem; font-size: 2rem; }
 
-/* Form layout */
 form {
-  margin: 1.5rem auto;
-  max-width: 500px;
-  background: rgba(255,255,255,0.9);
-  padding: 1rem;
-  border-radius: 8px;
-  display: grid;
+  margin: 1.5rem auto; max-width: 500px;
+  background: rgba(255,255,255,0.9); padding: 1rem;
+  border-radius: 8px; display: grid; grid-gap: 0.75rem;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 0.75rem;
+  text-align: left;
 }
 
 form input[type="text"],
 form input[type="date"],
-form input[type="datetime-local"],
-form textarea {
+form input[type="url"],
+form textarea,
+form select,
+form button,
+#add-reminder-btn {
   grid-column: span 2;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.5rem; font-size: 1rem;
+  border: 1px solid #ccc; border-radius: 4px;
 }
 
-form label {
-  font-size: 0.9rem;
-  align-self: center;
-  text-align: left;
+#add-reminder-btn {
+  background: #ffc107; color: #333; cursor: pointer;
+  display: inline-flex; align-items: center;
 }
+#add-reminder-btn:hover { background: #e0a800; }
 
-form textarea {
-  height: 4rem;
-  resize: vertical;
+form button[type="submit"] {
+  background: #28a745; color: white; cursor: pointer;
 }
+form button[type="submit"]:hover { background: #218838; }
 
-form button {
-  grid-column: span 2;
-  padding: 0.75rem;
-  font-size: 1rem;
-  background: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+#reminders-container .reminder-entry {
+  display: flex; gap: 0.5rem; grid-column: span 2;
 }
-form button:hover { background: #218838; }
+#reminders-container input {
+  flex: 1;
+}
+.reminder-entry button {
+  background: #dc3545; color: white; border: none;
+  border-radius: 4px; padding: 0 0.5rem; cursor: pointer;
+}
+.reminder-entry button:hover { background: #c82333; }
 
-/* Job list */
 #jobs {
-  list-style: none;
-  padding: 0;
-  max-width: 500px;
-  margin: 1rem auto;
-  text-align: left;
+  list-style: none; padding: 0;
+  max-width: 500px; margin: 1rem auto;
 }
-
 .job-item {
   background: rgba(255,255,255,0.95);
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  position: relative;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 1rem; margin-bottom: 1rem;
+  border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative; text-align: left;
 }
-
-.job-item h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
-}
-
-.job-item .controls {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
+.job-item h2 { margin: 0 0 0.5rem 0; font-size: 1.2rem; }
+.job-item .controls { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
 .job-item .controls select,
 .job-item .controls button {
-  padding: 0.4rem 0.6rem;
-  font-size: 0.9rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  padding: 0.4rem 0.6rem; font-size: 0.9rem;
+  border-radius: 4px; border: 1px solid #ccc;
 }
+.job-item .controls button { background: #dc3545; color: #fff; cursor: pointer; }
+.job-item .controls button:hover { background: #c82333; }
 
-.job-item .controls button {
-  background: #dc3545;
-  color: #fff;
-  border: none;
-  transition: background 0.2s ease;
-}
-.job-item .controls button:hover {
-  background: #c82333;
-}
-
-.job-item .notes-text {
-  display: inline-block;
-  margin-right: 0.5rem;
-}
-
-.job-item textarea {
-  width: 100%;
-  padding: 0.4rem;
-  font-size: 0.9rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+.job-item .notes-text { display: inline-block; margin-right: 0.5rem; }
+.job-item textarea { width: 100%; padding: 0.4rem; font-size: 0.9rem; }
 
 .job-item .history {
-  font-size: 0.85rem;
-  margin-top: 0.75rem;
-  background: #f9fafb;
-  padding: 0.5rem;
-  border-radius: 4px;
+  font-size: 0.85rem; margin-top: 0.75rem;
+  background: #f9fafb; padding: 0.5rem; border-radius: 4px;
 }
+.job-item .history li { margin-bottom: 0.25rem; }
